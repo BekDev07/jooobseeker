@@ -1,0 +1,33 @@
+import customAxios, { checkForUnauthorizedResponse } from "../../utils/axios";
+import { clearValues } from "./jobSlice";
+import { showLoading, hideLoading, getAllJobs } from "../allJobs/allJobsSlice";
+export const createJobThunk = async (job, thunkAPI) => {
+  try {
+    const resp = await customAxios.post("/jobs", job);
+    thunkAPI.dispatch(clearValues());
+    return resp.data;
+  } catch (error) {
+    return checkForUnauthorizedResponse(error, thunkAPI);
+  }
+};
+export const deleteJobThunk = async (jobId, thunkAPI) => {
+  thunkAPI.dispatch(showLoading());
+  try {
+    const resp = await customAxios.delete(`/jobs/${jobId}`);
+    thunkAPI.dispatch(getAllJobs());
+    return resp.data.msg;
+  } catch (error) {
+    thunkAPI.dispatch(hideLoading());
+    return checkForUnauthorizedResponse(error, thunkAPI);
+  }
+};
+export const editJobThunk = async ({ jobId, job }, thunkAPI) => {
+  try {
+    const resp = await customAxios.patch(`/jobs/${jobId}`, job);
+    thunkAPI.dispatch(clearValues());
+    // navigate("/");
+    return resp.data;
+  } catch (error) {
+    return checkForUnauthorizedResponse(error, thunkAPI);
+  }
+};
